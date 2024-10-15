@@ -2,13 +2,13 @@ from tkinter import *
 import random
 
 # Constants
-GAME_WIDTH = 700
-GAME_HEIGHT = 500
-SPEED = 50
-SPACE_SIZE = 50
+GAME_WIDTH = 1000
+GAME_HEIGHT = 700
+SPEED = 110
+SPACE_SIZE = 25
 BODY_PARTS = 3
-SNAKE_COLOR = "#00FF00"
-FOOD_COLOR = "#FF0000"
+SNAKE_COLOR = "#0000FF"
+FOOD_COLOR = "#FFFF00"
 BACKGROUND_COLOR = "#000000"
 
 class Snake:
@@ -77,9 +77,11 @@ def next_turn(snake, food):
         del snake.coordinates[-1]
         canvas.delete(snake.squares[-1])
         del snake.squares[-1]
-
-    # Schedule the next turn
-    window.after(SPEED, next_turn, snake, food)
+    
+    if check_collision(snake):
+        game_over()
+    else:
+        window.after(SPEED, next_turn, snake, food)
 
 def change_direction(new_direction):
     global direction
@@ -99,13 +101,27 @@ def change_direction(new_direction):
             direction = new_direction
     
 
-def check_collision():
-    # Placeholder for collision detection logic
-    pass
+def check_collision(snake):
+    x, y = snake.coordinates[0]
+
+    # Check if the snake has collided with the walls or itself
+    if x < 0 or x >= GAME_WIDTH:
+        return True
+    
+    elif y < 0 or y >= GAME_HEIGHT:
+        return True
+    
+    for body_part in snake.coordinates[1:]:
+        if x == body_part[0] and y == body_part[1]:
+            return True
+    
+    return False # No collision
 
 def game_over():
-    # Placeholder for game over logic
-    pass
+    canvas.delete(ALL)
+    canvas.create_text(canvas.winfo_width() / 2, canvas.winfo_height() / 2,
+                        font=('consolas', 70), text="Game Over",
+                          fill="red", anchor="center", tag="gameover")
 
 # Initialize the main window
 window = Tk()
