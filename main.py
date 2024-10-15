@@ -21,9 +21,9 @@ class Snake:
         for i in range(0, BODY_PARTS):
             self.coordinates.append([0, 0])
 
-            for x, y in self.coordinates:
-                square = canvas.create_rectangle(x, y, x + SPACE_SIZE, y + SPACE_SIZE, fill=SNAKE_COLOR, tag="snake")
-                self.squares.append(square)
+        for x, y in self.coordinates:
+            square = canvas.create_rectangle(x, y, x + SPACE_SIZE, y + SPACE_SIZE, fill=SNAKE_COLOR, tag="snake")
+            self.squares.append(square)
 
 class Food:
     def __init__(self):
@@ -37,6 +37,10 @@ class Food:
         canvas.create_oval(x, y, x + SPACE_SIZE, y + SPACE_SIZE, fill=FOOD_COLOR, tag="food")
 
 def next_turn(snake, food):
+    # Ensure snake has coordinates
+    if not snake.coordinates:
+        return
+    
     # Get the current head position of the snake
     x, y = snake.coordinates[0]
 
@@ -57,10 +61,22 @@ def next_turn(snake, food):
     square = canvas.create_rectangle(x, y, x + SPACE_SIZE, y + SPACE_SIZE, fill=SNAKE_COLOR)
     snake.squares.insert(0, square)
 
-    # Remove the last part of the snake's body
-    del snake.coordinates[-1]
-    canvas.delete(snake.squares[-1])
-    del snake.squares[-1]
+    if x == food.coordinates[0] and y == food.coordinates[1]:
+        # The snake has eaten the food
+        global score
+        score += 1
+        label.config(text="Score: {}".format(score))
+
+        # Remove the food item from the canvas
+        canvas.delete("food")
+
+        # Create a new food item
+        food = Food()
+
+    else:
+        del snake.coordinates[-1]
+        canvas.delete(snake.squares[-1])
+        del snake.squares[-1]
 
     # Schedule the next turn
     window.after(SPEED, next_turn, snake, food)
