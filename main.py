@@ -66,8 +66,22 @@ def next_turn(snake, food):
     window.after(SPEED, next_turn, snake, food)
 
 def change_direction(new_direction):
-    # Placeholder for changing direction logic
-    pass
+    global direction
+
+    # Prevent the snake from reversing
+    if new_direction == "left":
+        if direction != "right":
+            direction = new_direction
+    elif new_direction == "right":
+        if direction != "left":
+            direction = new_direction
+    elif new_direction == "up":
+        if direction != "down":
+            direction = new_direction
+    elif new_direction == "down":
+        if direction != "up":
+            direction = new_direction
+    
 
 def check_collision():
     # Placeholder for collision detection logic
