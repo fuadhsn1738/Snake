@@ -4,7 +4,7 @@ import random, pygame
 # Initialize pygame for sound
 try:
     pygame.mixer.init()
-    beep_sound = pygame.mixer.Sound(r"E:\Coding\Python\Game\Snake\point-smooth-beep-230573.mp3")
+    beep_sound = pygame.mixer.Sound(r"E:\Coding\Python\Game\Snake\point-smooth-beep-230573.mp3") # Change the path to the beep sound
 except pygame.error:
     beep_sound = None
 
