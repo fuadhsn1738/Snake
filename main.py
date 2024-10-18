@@ -11,7 +11,8 @@ except pygame.error:
 # Constants
 GAME_WIDTH = 1000
 GAME_HEIGHT = 700
-SPEED = 110
+BASE_SPEED = 110  # Starting speed
+SPEED_INCREASE = 10  # Speed increment per 10 points
 SPACE_SIZE = 25
 BODY_PARTS = 3
 SNAKE_COLOR = "#0000FF"
@@ -81,7 +82,7 @@ def next_turn(snake, food):
 
     # Check if the snake eats the food
     if x == food.coordinates[0] and y == food.coordinates[1]:
-        global score
+        global score, current_speed
         score += 1
         label.config(text="Score: {}".format(score))
 
@@ -94,6 +95,10 @@ def next_turn(snake, food):
 
         # Create a new food item
         food = Food()
+
+        # Increase speed every 10 points
+        if score % 10 == 0:
+            current_speed = max(10, current_speed - SPEED_INCREASE)  # Ensure it doesn't get too fast
     else:
         # Remove the tail segment of the snake if no food is eaten
         del snake.coordinates[-1]
@@ -104,7 +109,7 @@ def next_turn(snake, food):
     if check_collision(snake):
         game_over()
     else:
-        window.after(SPEED, next_turn, snake, food)
+        window.after(current_speed, next_turn, snake, food)
 
 def change_direction(new_direction):
     global direction
@@ -145,10 +150,11 @@ def game_over():
     canvas.create_window(canvas.winfo_width() / 2, canvas.winfo_height() / 2 + 80, anchor="center", window=restart_button)
 
 def restart_game():
-    global snake, food, score, direction, restart_button
+    global snake, food, score, direction, restart_button, current_speed
     canvas.delete(ALL)
     score = 0
     direction = "down"
+    current_speed = BASE_SPEED  # Reset speed to base speed
     label.config(text="Score: {}".format(score))
     snake = Snake()
     food = Food()
@@ -163,9 +169,10 @@ window = Tk()
 window.title("Snake Imprezia")
 window.resizable(True, True)
 
-# Initialize the score and direction
+# Initialize the score, speed, and direction
 score = 0
 direction = "down"
+current_speed = BASE_SPEED  # Initialize the current speed
 
 # Create and pack the score label
 label = Label(window, text="Score: {}".format(score), font=('consolas', 40))
