@@ -1,5 +1,12 @@
 from tkinter import *
-import random
+import random, pygame
+
+# Initialize pygame for sound
+try:
+    pygame.mixer.init()
+    beep_sound = pygame.mixer.Sound(r"E:\Coding\Python\Game\Snake\point-smooth-beep-230573.mp3")
+except pygame.error:
+    beep_sound = None
 
 # Constants
 GAME_WIDTH = 1000
@@ -78,6 +85,10 @@ def next_turn(snake, food):
         score += 1
         label.config(text="Score: {}".format(score))
 
+        # Play beep sound when snake eats food
+        if beep_sound:
+            beep_sound.play()
+
         # Remove the food item from the canvas
         canvas.delete("food")
 
@@ -133,11 +144,6 @@ def game_over():
     restart_button = Button(window, text="Restart", command=restart_game)
     canvas.create_window(canvas.winfo_width() / 2, canvas.winfo_height() / 2 + 80, anchor="center", window=restart_button)
 
-
-    # Create the restart button and place it below the game over text
-    restart_button = Button(window, text="Restart", command=restart_game)
-    restart_button.pack()
-
 def restart_game():
     global snake, food, score, direction, restart_button
     canvas.delete(ALL)
@@ -147,7 +153,10 @@ def restart_game():
     snake = Snake()
     food = Food()
     next_turn(snake, food)
-    restart_button.destroy()
+    
+    # Destroy the restart button if it exists
+    if restart_button:
+        restart_button.destroy()
 
 # Initialize the main window
 window = Tk()
