@@ -40,7 +40,7 @@ def next_turn(snake, food):
     # Ensure snake has coordinates
     if not snake.coordinates:
         return
-    
+
     # Get the current head position of the snake
     x, y = snake.coordinates[0]
 
@@ -53,7 +53,18 @@ def next_turn(snake, food):
         x -= SPACE_SIZE
     elif direction == "right":
         x += SPACE_SIZE
-    
+
+    # Implement screen wrapping logic
+    if x < 0:
+        x = GAME_WIDTH - SPACE_SIZE
+    elif x >= GAME_WIDTH:
+        x = 0
+
+    if y < 0:
+        y = GAME_HEIGHT - SPACE_SIZE
+    elif y >= GAME_HEIGHT:
+        y = 0
+
     # Insert the new head position
     snake.coordinates.insert(0, (x, y))
 
@@ -61,8 +72,8 @@ def next_turn(snake, food):
     square = canvas.create_rectangle(x, y, x + SPACE_SIZE, y + SPACE_SIZE, fill=SNAKE_COLOR)
     snake.squares.insert(0, square)
 
+    # Check if the snake eats the food
     if x == food.coordinates[0] and y == food.coordinates[1]:
-        # The snake has eaten the food
         global score
         score += 1
         label.config(text="Score: {}".format(score))
@@ -72,17 +83,17 @@ def next_turn(snake, food):
 
         # Create a new food item
         food = Food()
-
     else:
+        # Remove the tail segment of the snake if no food is eaten
         del snake.coordinates[-1]
         canvas.delete(snake.squares[-1])
         del snake.squares[-1]
-    
+
+    # Check for self-collision
     if check_collision(snake):
         game_over()
     else:
         window.after(SPEED, next_turn, snake, food)
-
 
 def change_direction(new_direction):
     global direction
@@ -100,37 +111,30 @@ def change_direction(new_direction):
     elif new_direction == "down":
         if direction != "up":
             direction = new_direction
-    
 
 def check_collision(snake):
     x, y = snake.coordinates[0]
 
-    # Check if the snake has collided with the walls or itself
-    if x < 0 or x >= GAME_WIDTH:
-        return True
-    
-    elif y < 0 or y >= GAME_HEIGHT:
-        return True
-    
+    # Check if the snake has collided with itself
     for body_part in snake.coordinates[1:]:
         if x == body_part[0] and y == body_part[1]:
             return True
-    
+
     return False # No collision
 
 def game_over():
     global restart_button
     canvas.delete(ALL)
     canvas.create_text(canvas.winfo_width() / 2, canvas.winfo_height() / 2,
-<<<<<<< Updated upstream
                        font=('consolas', 70), text="Game Over",
                        fill="red", anchor="center", tag="gameover")
     
     # Create the restart button and place it on the canvas
-=======
-                        font=('consolas', 70), text="Game Over",
-                          fill="red", anchor="center", tag="gameover")
->>>>>>> Stashed changes
+    restart_button = Button(window, text="Restart", command=restart_game)
+    canvas.create_window(canvas.winfo_width() / 2, canvas.winfo_height() / 2 + 80, anchor="center", window=restart_button)
+
+
+    # Create the restart button and place it below the game over text
     restart_button = Button(window, text="Restart", command=restart_game)
     restart_button.pack()
 
